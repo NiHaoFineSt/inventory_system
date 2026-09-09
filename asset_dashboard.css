@@ -1,0 +1,293 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+.dashboard-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR STYLING --- */
+.sidebar {
+    width: 240px;
+    background-color: #444441;
+    /* Dashboard green sidebar theme */
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-right: 1px solid #ffffff;
+}
+
+/* LOGO AT TOP OF SIDEBAR */
+/* --- SIDEBAR LOGO (RECTANGULAR) --- */
+.sidebar-logo {
+    width: 100%;
+    /* Fills the sidebar width */
+    max-width: 180px;
+    /* Limits max width */
+    height: 70px;
+    /* Fixed height for rectangular shape */
+    border-radius: 12px;
+    /* Rounded rectangle corners */
+    overflow: hidden;
+    background-color: transparent;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    /* Adds inner padding around the logo image */
+    border: 1px solid #ffffff;
+}
+
+.sidebar-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Fits full rectangular logo without cropping or stretching */
+}
+
+.sidebar-menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 25px;
+    border: 1px solid #ffffff;
+    background-color: #444441;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn.active,
+.nav-btn:hover {
+    background-color: #626161;
+    color: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+}
+
+.logout-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #3f6212;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+    flex: 1;
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.top-banner {
+    background-color: #4d7c0f;
+    color: #ffffff;
+    padding: 14px 24px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.top-banner h1 {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* FILTERS BAR */
+.filter-bar {
+    background-color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 8px;
+    display: flex;
+    gap: 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.filter-group label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #475569;
+}
+
+.filter-group select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    font-size: 13px;
+}
+
+/* METRICS ROW */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+}
+
+.metric-card {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+}
+
+.metric-card h2 {
+    font-size: 24px;
+    color: #3f6212;
+    font-weight: 700;
+}
+
+.metric-card p {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+/* WIDGETS LOWER SECTION */
+.widgets-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    gap: 16px;
+}
+
+.widget-card {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.widget-card h3 {
+    font-size: 14px;
+    color: #1e293b;
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+/* GAUGE CHART SIMULATION */
+.gauge-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.gauge-body {
+    width: 140px;
+    height: 70px;
+    background: #e2e8f0;
+    border-top-left-radius: 140px;
+    border-top-right-radius: 140px;
+    position: relative;
+    overflow: hidden;
+}
+
+.gauge-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #65a30d;
+    transform-origin: center bottom;
+    transform: rotate(0.5turn);
+}
+
+.gauge-cover {
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    background: #ffffff;
+    border-top-left-radius: 100px;
+    border-top-right-radius: 100px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #3f6212;
+    padding-bottom: 4px;
+}
+
+/* BREAKDOWN LIST */
+.breakdown-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.breakdown-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+/* BAR CHART BARS */
+.bar-item {
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.bar-bg {
+    background-color: #f1f5f9;
+    height: 20px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.bar-fill {
+    background-color: #4d7c0f;
+    height: 100%;
+    color: #ffffff;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-weight: 600;
+}

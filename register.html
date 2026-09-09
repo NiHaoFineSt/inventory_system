@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Tracker - Register</title>
+    <link rel="stylesheet" href="index.css">
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+</head>
+
+<body>
+    <div class="register-card">
+        <div class="register-container">
+            <!-- logo -->
+            <div class="logo-circle">
+                <img src="logo.jpg" alt="Olympia edu logo">
+            </div>
+            <h1 class="brand-title">Create Account</h1>
+            <p class="brand-subtitle">Scan, manage, and report office equipment</p>
+
+        </div>
+        <div class="role-switcher">
+            <button class="role-btn active" id="staffBtn" onclick="selectRole('staff')">Staff</button>
+            <button class="role-btn" id="adminBtn" onclick="selectRole('asset_team')">Asset Team</button>
+        </div>
+
+        <div class="">
+            <!-- Register Form -->
+            <form class="login-form" action="index.html" method="POST">
+                <input type="hidden" id="selectedRole" name="role" value="staff">
+
+                <!-- Full Name Input -->
+                <div class="input-group">
+                    <label for="fullname">Full Name</label>
+                    <div class="input-field">
+                        <span class="material-icons-outlined icon">person</span>
+                        <input type="text" id="fullname" name="fullname" placeholder="John Doe" required>
+                    </div>
+                </div>
+
+                <!-- Email Input -->
+                <div class="input-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-field">
+                        <span class="material-icons-outlined icon">email</span>
+                        <input type="email" id="email" name="email" placeholder="user@company.com" required>
+                    </div>
+                </div>
+
+                <!-- Password Input -->
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-field">
+                        <span class="material-icons-outlined icon">lock</span>
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <!-- Confirm Password Input -->
+                <div class="input-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <div class="input-field">
+                        <span class="material-icons-outlined icon">verified_user</span>
+                        <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••"
+                            required>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">Register as Staff</button>
+
+                <!-- Navigation Link back to Login -->
+                <div class="form-footer" style="align-items: center; margin-top: 10px;">
+                    <span class="register-text">Already have an account? <a href="index.html" class="register-link">Sign
+                            In</a></span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function selectRole(role) {
+            const staffBtn = document.getElementById('staffBtn');
+            const adminBtn = document.getElementById('adminBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const roleInput = document.getElementById('selectedRole');
+
+            roleInput.value = role;
+
+            if (role === 'staff') {
+                staffBtn.classList.add('active');
+                adminBtn.classList.remove('active');
+                submitBtn.textContent = 'Register as Staff';
+            } else {
+                adminBtn.classList.add('active');
+                staffBtn.classList.remove('active');
+                submitBtn.textContent = 'Register as Asset Team';
+            }
+        }
+    </script>
+
+</body>
+
+</html>

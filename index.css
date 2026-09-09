@@ -1,0 +1,203 @@
+/* --- Reset & Base Styles --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* --- Card Container --- */
+.login-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 400px;
+    padding: 40px 32px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border: 1px solid #f1f5f9;
+}
+
+/* --- Branding --- */
+.brand-container {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+/* --- Branding & Logo --- */
+.brand-container {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.logo-circle {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.15);
+    background-color: #ffffff;
+    border: 2px solid #e2e8f0;
+}
+
+.logo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.brand-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.5px;
+}
+
+.brand-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 6px;
+}
+
+/* --- Role Switcher --- */
+.role-switcher {
+    background-color: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+    display: flex;
+    margin-bottom: 24px;
+}
+
+.role-btn {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.role-btn.active {
+    background-color: #ffffff;
+    color: #1e40af;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* --- Form Controls --- */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.input-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-field .icon {
+    position: absolute;
+    left: 14px;
+    color: #94a3b8;
+    font-size: 20px;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 12px 14px 12px 42px;
+    font-size: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: #0f172a;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field input:focus {
+    border-color: #1e40af;
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* --- Form Footer & Navigation Links --- */
+.form-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* Aligns both items to the right */
+    gap: 6px;
+    /* Adds clean spacing between Forgot Password and Register */
+    margin-top: -4px;
+}
+
+.forgot-link,
+.register-link {
+    font-size: 13px;
+    color: #1e40af;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.forgot-link:hover,
+.register-link:hover {
+    text-decoration: underline;
+    color: #1d4ed8;
+}
+
+.register-text {
+    font-size: 13px;
+    color: #64748b;
+    /* Neutral muted color for the helper text */
+}
+
+/* --- Submit Button --- */
+.submit-btn {
+    background-color: #1e40af;
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.submit-btn:hover {
+    background-color: #1d4ed8;
+}
+
+.submit-btn:active {
+    transform: scale(0.99);
+}
