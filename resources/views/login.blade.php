@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asset Tracker - Login</title>
-    <link rel="stylesheet" href="index.css">
+    @vite(['resources/css/style.css'])
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
@@ -18,8 +18,7 @@
         <!-- Logo & Branding -->
         <div class="brand-container">
             <div class="logo-circle">
-                <img src="logo.jpg" alt="Olympia edu logo">
-
+                <img src="{{ asset('logo.jpg') }}" style="width: 80px; height: auto;" alt="Logo">
             </div>
             <h1 class="brand-title">Asset Tracker</h1>
             <p class="brand-subtitle">Scan, manage, and report office equipment</p>
@@ -27,12 +26,22 @@
 
         <!-- Role Selector Tabs -->
         <div class="role-switcher">
-            <button class="role-btn active" id="staffBtn" onclick="selectRole('staff')">Staff</button>
-            <button class="role-btn" id="adminBtn" onclick="selectRole('asset_team')">Asset Team</button>
+            <button type="button" class="role-btn active" id="staffBtn" onclick="selectRole('staff')">General Staff</button>
+            <button type="button" class="role-btn" id="adminBtn" onclick="selectRole('asset_team')">Asset Team</button>
         </div>
 
+        <!-- Validation Errors Display -->
+        @if ($errors->any())
+            <div style="color: #e63946; background: #ffe6e6; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 14px;">
+                @foreach ($errors->all() as $error)
+                    <p style="margin: 0;">{{ $error }}</p>
+                @endforeach
+            </div>
+        @endif
+
         <!-- Login Form -->
-        <form class="login-form" action="#" method="POST">
+        <form class="login-form" action="{{ route('login.post') }}" method="POST">
+            @csrf
             <input type="hidden" id="selectedRole" name="role" value="staff">
 
             <!-- Email Input -->
@@ -40,7 +49,7 @@
                 <label for="email">Email Address</label>
                 <div class="input-field">
                     <span class="material-icons-outlined icon">email</span>
-                    <input type="email" id="email" name="email" placeholder="user@company.com" required>
+                    <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="user@company.com" required>
                 </div>
             </div>
 
@@ -53,12 +62,12 @@
                 </div>
             </div>
 
-            <!-- Forgot Password and register link -->
+            <!-- Forgot Password & Register Navigation -->
             <div class="form-footer">
                 <a href="#" class="forgot-link">Forgot Password?</a>
-                <span class="register-text">Don't have an account? <a href="register.html"
-                        class="register-link">Register Here</a></span>
+                <span class="register-text">Don't have an account? <a href="{{ route('register') }}" class="register-link">Register Here</a></span>
             </div>
+
             <!-- Submit Button -->
             <button type="submit" class="submit-btn" id="submitBtn">Sign In as Staff</button>
         </form>
@@ -66,7 +75,7 @@
     </div>
 
     <script>
-        // 1. Role switching logic
+        // Role switching logic
         function selectRole(role) {
             const staffBtn = document.getElementById('staffBtn');
             const adminBtn = document.getElementById('adminBtn');
@@ -85,49 +94,6 @@
                 submitBtn.textContent = 'Sign In as Asset Team';
             }
         }
-
-        // 2. Form submission & redirection logic
-        document.querySelector('.login-form').addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevents default page refresh
-
-            const selectedRole = document.getElementById('selectedRole').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            // Fetch API request to XAMPP PHP backend
-            fetch('login.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                    role: selectedRole
-                })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        // Check role returned from database or selected tab
-                        if (selectedRole === 'asset_team' || data.user.role === 'asset_team') {
-                            window.location.href = 'asset_dashboard.html'; // Redirect to Asset Team Dashboard
-                        } else {
-                            window.location.href = 'staff_home.html'; // Redirect to General Staff Page
-                        }
-                    } else {
-                        alert(data.message || 'Invalid login credentials');
-                    }
-                })
-                .catch(error => {
-                    // Demo fallback: redirect directly during UI testing if PHP backend is off
-                    if (selectedRole === 'asset_team') {
-                        window.location.href = 'asset_dashboard.html';
-                    } else {
-                        window.location.href = 'staff_home.html';
-                    }
-                });
-        });
     </script>
 
 </body>

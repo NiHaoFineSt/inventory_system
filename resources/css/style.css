@@ -15,6 +15,8 @@ body {
     padding: 20px;
 }
 
+
+
 /* --- Card Container --- */
 .login-card {
     background: #ffffff;
@@ -32,30 +34,21 @@ body {
     margin-bottom: 28px;
 }
 
-/* --- Branding & Logo --- */
-.brand-container {
-    text-align: center;
-    margin-bottom: 28px;
-}
-
 .logo-circle {
     width: 72px;
     height: 72px;
+    background-color: #1e40af;
+    color: #ffffff;
     border-radius: 50%;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 16px auto;
-    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.15);
-    background-color: #ffffff;
-    border: 2px solid #e2e8f0;
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.25);
 }
 
-.logo-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.logo-circle .material-icons-outlined {
+    font-size: 38px;
 }
 
 .brand-title {
@@ -148,36 +141,21 @@ body {
     box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
-/* --- Form Footer & Navigation Links --- */
+/* --- Form Footer --- */
 .form-footer {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    /* Aligns both items to the right */
-    gap: 6px;
-    /* Adds clean spacing between Forgot Password and Register */
-    margin-top: -4px;
+    text-align: right;
+    margin-top: -6px;
 }
 
-.forgot-link,
-.register-link {
+.forgot-link {
     font-size: 13px;
     color: #1e40af;
     font-weight: 600;
     text-decoration: none;
-    transition: color 0.2s ease;
 }
 
-.forgot-link:hover,
-.register-link:hover {
+.forgot-link:hover {
     text-decoration: underline;
-    color: #1d4ed8;
-}
-
-.register-text {
-    font-size: 13px;
-    color: #64748b;
-    /* Neutral muted color for the helper text */
 }
 
 /* --- Submit Button --- */

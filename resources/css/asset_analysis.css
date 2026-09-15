@@ -18,8 +18,7 @@ body {
 /* --- SIDEBAR STYLING --- */
 .sidebar {
     width: 240px;
-    background-color: #444441;
-    /* Dashboard green sidebar theme */
+    background-color: #041f48;
     padding: 24px 16px;
     display: flex;
     flex-direction: column;
@@ -27,34 +26,23 @@ body {
     border-right: 1px solid #ffffff;
 }
 
-/* LOGO AT TOP OF SIDEBAR */
-/* --- SIDEBAR LOGO (RECTANGULAR) --- */
 .sidebar-logo {
     width: 100%;
-    /* Fills the sidebar width */
     max-width: 180px;
-    /* Limits max width */
     height: 70px;
-    /* Fixed height for rectangular shape */
     border-radius: 12px;
-    /* Rounded rectangle corners */
     overflow: hidden;
     background-color: transparent;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     margin-bottom: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px;
-    /* Adds inner padding around the logo image */
-    border: 1px solid #ffffff;
 }
 
 .sidebar-logo img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    /* Fits full rectangular logo without cropping or stretching */
 }
 
 .sidebar-menu {
@@ -69,7 +57,7 @@ body {
     padding: 12px 16px;
     border-radius: 25px;
     border: 1px solid #ffffff;
-    background-color: #444441;
+    background-color: #041f48;
     color: #ffffff;
     font-weight: 600;
     font-size: 13px;
@@ -77,12 +65,13 @@ body {
     align-items: center;
     gap: 10px;
     cursor: pointer;
+    text-decoration: none;
     transition: all 0.2s ease;
 }
 
 .nav-btn.active,
 .nav-btn:hover {
-    background-color: #626161;
+    background-color: #041f48;
     color: #ffffff;
     border-color: #ffffff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -96,7 +85,7 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: #3f6212;
+    color: #ffffff;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
@@ -112,7 +101,7 @@ body {
 }
 
 .top-banner {
-    background-color: #4d7c0f;
+    background-color: #041f48;
     color: #ffffff;
     padding: 14px 24px;
     border-radius: 8px;
@@ -155,10 +144,10 @@ body {
     font-size: 13px;
 }
 
-/* METRICS ROW */
+/* METRICS GRID */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
 }
 
@@ -172,7 +161,7 @@ body {
 
 .metric-card h2 {
     font-size: 24px;
-    color: #3f6212;
+    color: #041f48;
     font-weight: 700;
 }
 
@@ -183,10 +172,10 @@ body {
     font-weight: 500;
 }
 
-/* WIDGETS LOWER SECTION */
+/* CHARTS WIDGETS */
 .widgets-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1.5fr;
+    grid-template-columns: 1.5fr 1fr;
     gap: 16px;
 }
 
@@ -201,88 +190,22 @@ body {
     font-size: 14px;
     color: #1e293b;
     margin-bottom: 14px;
-    text-align: center;
 }
 
-/* GAUGE CHART SIMULATION */
-.gauge-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.gauge-body {
-    width: 140px;
-    height: 70px;
-    background: #e2e8f0;
-    border-top-left-radius: 140px;
-    border-top-right-radius: 140px;
-    position: relative;
-    overflow: hidden;
-}
-
-.gauge-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #65a30d;
-    transform-origin: center bottom;
-    transform: rotate(0.5turn);
-}
-
-.gauge-cover {
-    position: absolute;
-    width: 100px;
-    height: 50px;
-    background: #ffffff;
-    border-top-left-radius: 100px;
-    border-top-right-radius: 100px;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 16px;
-    color: #3f6212;
-    padding-bottom: 4px;
-}
-
-/* BREAKDOWN LIST */
-.breakdown-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.breakdown-list li {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
-    padding-bottom: 6px;
-    border-bottom: 1px dashed #e2e8f0;
-}
-
-/* BAR CHART BARS */
 .bar-item {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     font-size: 12px;
 }
 
 .bar-bg {
     background-color: #f1f5f9;
-    height: 20px;
+    height: 22px;
     border-radius: 4px;
     overflow: hidden;
     margin-top: 4px;
 }
 
 .bar-fill {
-    background-color: #4d7c0f;
     height: 100%;
     color: #ffffff;
     font-size: 11px;
@@ -290,4 +213,75 @@ body {
     align-items: center;
     padding-left: 8px;
     font-weight: 600;
+}
+
+.breakdown-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.breakdown-list li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+/* DATA TABLE STYLING */
+.table-card {
+    background: #ffffff;
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.table-card h3 {
+    font-size: 14px;
+    color: #1e293b;
+    margin-bottom: 14px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.data-table th {
+    background-color: #f8fafc;
+    color: #475569;
+    font-weight: 600;
+}
+
+/* STATUS BADGES */
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.badge.in-use {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge.available {
+    background-color: #e0f2fe;
+    color: #075985;
+}
+
+.badge.damaged {
+    background-color: #fee2e2;
+    color: #991b1b;
 }
