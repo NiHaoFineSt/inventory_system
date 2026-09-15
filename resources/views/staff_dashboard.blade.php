@@ -39,16 +39,16 @@
     <!-- PROFILE CARD WITH ASSIGNED ASSETS -->
     <section class="profile-card">
         <div class="profile-details">
-            <h2>{{ $user->name ?? 'Aussy' }}</h2>
-            <p><strong>Email:</strong> {{ $user->email ?? 'aussy@gmail.com' }}</p>
-            <p><strong>Role:</strong> {{ ucfirst($user->role ?? 'Staff') }}</p>
-            <p><strong>Assigned Assets:</strong> 
-                @if(isset($assignedAssets) && $assignedAssets->count() > 0)
+            <h2>{{ $user->name }}</h2>
+            <p><strong>Email:</strong> {{ $user->email }}</p>
+            <p><strong>Role:</strong> {{ $user->role->label() }}</p>
+            <p><strong>Assigned Assets:</strong>
+                @if($assignedAssets->count() > 0)
                     <span class="badge-asset">
                         {{ $assignedAssets->pluck('asset_name')->implode(', ') }}
                     </span>
                 @else
-                    <span class="badge-asset">Adjustable Standing Desk, keyboard</span>
+                    <span class="badge-asset">No assets currently assigned</span>
                 @endif
             </p>
         </div>
@@ -81,9 +81,9 @@
                             <td>{{ $report->issue_type ?? 'N/A' }}</td>
                             <td>{{ $report->description ?? 'N/A' }}</td>
                             <td>
-                                @php $st = strtolower($report->status ?? 'pending'); @endphp
-                                <span class="status-badge {{ $st === 'approved' ? 'status-approved' : ($st === 'rejected' ? 'status-rejected' : 'status-pending') }}">
-                                    {{ ucfirst($report->status ?? 'Pending') }}
+                                @php $st = $report->status?->value ?? 'Pending'; @endphp
+                                <span class="status-badge {{ $st === 'Resolved' ? 'status-approved' : 'status-pending' }}">
+                                    {{ $st }}
                                 </span>
                             </td>
                         </tr>

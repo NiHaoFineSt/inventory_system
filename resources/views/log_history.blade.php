@@ -96,7 +96,7 @@
                     <tbody id="logTableBody">
     @forelse($logs as $log)
         @php
-            $action = strtoupper($log->action ?? 'ADDED');
+            $action = strtoupper($log->action?->value ?? 'ADDED');
             $badgeClass = match(strtolower($action)) {
                 'added', 'add', 'created' => 'badge-added',
                 'edited', 'updated' => 'badge-edited',

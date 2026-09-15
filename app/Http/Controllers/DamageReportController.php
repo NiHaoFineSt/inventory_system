@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\DamageReportStatus;
 use App\Http\Requests\StoreDamageReportRequest;
 use App\Http\Requests\UpdateDamageReportStatusRequest;
 use App\Models\DamageReport;
@@ -42,7 +43,7 @@ class DamageReportController extends Controller
         /** @var User $actor */
         $actor = Auth::user();
 
-        $this->damageReportService->updateStatus($actor, $report, $request->enum('status', \App\Enums\DamageReportStatus::class));
+        $this->damageReportService->updateStatus($actor, $report, $request->enum('status', DamageReportStatus::class));
 
         return response()->json(['status' => 'success', 'report' => $report->fresh()]);
     }

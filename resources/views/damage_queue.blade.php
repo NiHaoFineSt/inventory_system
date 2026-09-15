@@ -135,18 +135,22 @@
                                             <div class="hover-title">Report Details</div>
                                             <div class="hover-field"><span class="hover-label">Reported By:</span> {{ $item->reported_by ?? 'Staff' }}</div>
                                             <div class="hover-field"><span class="hover-label">Issue Type:</span> {{ $item->issue_type ?? 'N/A' }}</div>
-                                            <div class="hover-field"><span class="hover-label">Description:</span> {{ $item->description ?? $item->issue_description ?? 'No description provided.' }}</div>
+                                            <div class="hover-field"><span class="hover-label">Description:</span> {{ $item->description ?? 'No description provided.' }}</div>
                                             <div class="hover-field"><span class="hover-label">Date:</span> {{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d H:i') : 'N/A' }}</div>
                                         </div>
                                     </div>
                                 </td>
 
                                 <td><span class="badge action-needed">{{ $item->issue_type ?? 'N/A' }}</span></td>
-                                <td>{{ $item->status ?? 'Pending Inspection' }}</td>
+                                <td>{{ $item->status?->value ?? 'Pending' }}</td>
                                 <td>{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') : 'N/A' }}</td>
-                                
+
                                 <td style="text-align: center;">
-                                    <button class="btn-action" style="background-color: #2563eb; color: #fff; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer;">Resolve</button>
+                                    @if ($item->status?->value !== 'Resolved')
+                                        <button type="button" class="btn-action resolve-btn" data-report-id="{{ $item->id }}" style="background-color: #2563eb; color: #fff; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer;">Resolve</button>
+                                    @else
+                                        <span style="color: #16a34a; font-weight: 600;">Resolved</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -200,17 +204,17 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="damage_photo" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                    <label for="image" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
                         SNAP / UPLOAD DAMAGE PHOTO
                     </label>
-                    <input type="file" id="damage_photo" name="damage_photo" class="form-control" style="width: 100%; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <input type="file" id="image" name="image" accept="image/*" class="form-control" style="width: 100%; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="issue_description" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                    <label for="description" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
                         ISSUE DESCRIPTION
                     </label>
-                    <textarea id="issue_description" name="issue_description" rows="3" class="form-control" placeholder="Describe the damage or fault..." style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea>
+                    <textarea id="description" name="description" rows="3" class="form-control" placeholder="Describe the damage or fault..." style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea>
                 </div>
 
                 <button type="submit" style="width: 100%; background-color: #4d7c0f; color: #fff; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;">
@@ -262,7 +266,7 @@
 
                     const data = await response.json();
 
-                    if (response.ok && data.status === 'success' && data.asset) {
+                    if (response.ok && data.success && data.asset) {
                         nameInput.value = data.asset.asset_name;
                     } else {
                         nameInput.value = '';
@@ -280,6 +284,34 @@
                     timeout = setTimeout(() => func.apply(this, args), delay);
                 };
             }
+
+            document.querySelectorAll('.resolve-btn').forEach(function (button) {
+                button.addEventListener('click', async function () {
+                    const reportId = button.dataset.reportId;
+                    const url = "{{ route('damage_queue.update_status', ['report' => 'TARGET_ID']) }}".replace('TARGET_ID', reportId);
+
+                    try {
+                        const response = await fetch(url, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                            },
+                            body: JSON.stringify({ status: 'Resolved' })
+                        });
+
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert('Failed to resolve this report.');
+                        }
+                    } catch (error) {
+                        console.error('Resolve Error:', error);
+                        alert('Failed to resolve this report.');
+                    }
+                });
+            });
         });
     </script>
 </body>
