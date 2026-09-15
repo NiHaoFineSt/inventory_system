@@ -6,8 +6,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use App\Models\Asset;
+use App\Models\User;
 use App\Http\Controllers\TagGeneratorController;
 use App\Http\Controllers\DamageReportController;
+use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\LogHistoryController;
 
 /*
@@ -51,8 +53,22 @@ Route::get('/register', function () {
     return view('register');
 })->name('register');
 
-Route::post('/register', function () {
-    return redirect()->route('login');
+Route::post('/register', function (Request $request) {
+    $validated = $request->validate([
+        'name'     => ['required', 'string', 'max:255'],
+        'email'    => ['required', 'email', 'max:255', 'unique:users,email'],
+        'role'     => ['required', 'in:staff,asset_team'],
+        'password' => ['required', 'confirmed', 'min:8'],
+    ]);
+
+    User::create([
+        'name'     => $validated['name'],
+        'email'    => $validated['email'],
+        'role'     => $validated['role'],
+        'password' => Hash::make($validated['password']),
+    ]);
+
+    return redirect()->route('login')->with('status', 'Account created. You may now sign in.');
 })->name('register.post');
 
 Route::post('/logout', function (Request $request) {
