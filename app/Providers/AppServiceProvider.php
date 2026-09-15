@@ -20,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Model::shouldBeStrict(! $this->app->isProduction());
+        // Deliberately not using the full Model::shouldBeStrict() here: its
+        // preventAccessingMissingAttributes() would break the blade views'
+        // `??` fallback chains over legitimately-optional display properties.
+        Model::preventLazyLoading(! $this->app->isProduction());
+        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
     }
 }
