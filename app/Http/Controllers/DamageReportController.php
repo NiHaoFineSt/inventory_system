@@ -2,82 +2,48 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Http\Requests\StoreDamageReportRequest;
+use App\Http\Requests\UpdateDamageReportStatusRequest;
 use App\Models\DamageReport;
+use App\Models\User;
+use App\Services\DamageReportService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class DamageReportController extends Controller
 {
-    /**
-     * Display the damage queue page with submitted reports.
-     */
-    public function index()
-    {
-        $damagedAssets = DB::table('damage_reports')
-            ->orderBy('created_at', 'desc')
-            ->get();
+    public function __construct(private readonly DamageReportService $damageReportService) {}
 
-        return view('damage_queue', [
-            'damagedAssets' => $damagedAssets,
-            'reports'       => $damagedAssets,
-        ]);
+    public function index(): View
+    {
+        $reports = DamageReport::latest()->get();
+
+        return view('damage_queue', ['damagedAssets' => $reports, 'reports' => $reports]);
     }
 
-    /**
-     * Store new damage reports submitted by Staff or Asset Team.
-     */
-    public function store(Request $request)
+    public function store(StoreDamageReportRequest $request): RedirectResponse
     {
-        $request->validate([
-            'tracking_number' => 'required',
-            'asset_name'      => 'required',
-            'issue_type'      => 'required',
-        ]);
+        /** @var User $reporter */
+        $reporter = Auth::user();
 
-        $user = Auth::user();
+        $this->damageReportService->submit(
+            $reporter,
+            $request->validated(),
+            $request->file('image'),
+        );
 
-        $description = $request->input('description') 
-                    ?? $request->input('issue_description') 
-                    ?? '';
+        return back()->with('success', 'Damage report submitted successfully.');
+    }
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('damage_photos', 'public');
-        } elseif ($request->hasFile('damage_photo')) {
-            $imagePath = $request->file('damage_photo')->store('damage_photos', 'public');
-        }
+    public function updateStatus(UpdateDamageReportStatusRequest $request, DamageReport $report): JsonResponse
+    {
+        /** @var User $actor */
+        $actor = Auth::user();
 
-        $reporterName = $user->name ?? $user->email ?? 'Aussy';
+        $this->damageReportService->updateStatus($actor, $report, $request->enum('status', \App\Enums\DamageReportStatus::class));
 
-        DB::transaction(function () use ($request, $user, $reporterName, $description, $imagePath) {
-            // 1. Insert into damage_reports table
-            DB::table('damage_reports')->insert([
-                'user_id'         => $user->id ?? 5,
-                'reported_by'     => $reporterName,
-                'tracking_number' => $request->tracking_number,
-                'asset_name'      => $request->asset_name,
-                'issue_type'      => $request->issue_type,
-                'description'     => $description,
-                'image'           => $imagePath,
-                'status'          => 'Pending Inspection',
-                'created_at'      => now(),
-                'updated_at'      => now(),
-            ]);
-
-            // 2. Insert into activity_logs table so it displays on Log History
-            DB::table('activity_logs')->insert([
-                'user_id'         => $user->id ?? 5,
-                'action'          => 'REPORTED',
-                'asset_name'      => $request->asset_name,
-                'tracking_number' => $request->tracking_number,
-                'performed_by'    => $reporterName,
-                'description'     => "Issue ({$request->issue_type}): {$description}",
-                'created_at'      => now(),
-                'updated_at'      => now(),
-            ]);
-        });
-
-        return redirect()->back()->with('success', 'Damage report submitted successfully.');
+        return response()->json(['status' => 'success', 'report' => $report->fresh()]);
     }
 }

@@ -2,17 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Asset; // Ensure your Asset model points to the 'asset' table
-use Illuminate\Http\Request;
+use App\Models\Asset;
+use App\Models\DamageReport;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function assetDashboard(): View
     {
-        // Fetch all assets from the 'asset' table
-        $assets = Asset::all();
+        return view('asset_dashboard', ['assets' => Asset::all()]);
+    }
 
-        // Pass the dataset to your Blade view
-        return view('asset_dashboard', compact('assets'));
+    public function staffDashboard(): View
+    {
+        $user = Auth::user();
+
+        $reports = DamageReport::where('user_id', $user->id)->latest()->get();
+        $assignedAssets = Asset::where('assigned_to', $user->name)->get();
+
+        return view('staff_dashboard', compact('user', 'reports', 'assignedAssets'));
     }
 }

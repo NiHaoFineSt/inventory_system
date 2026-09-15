@@ -28,7 +28,7 @@
                 <a href="{{ route('asset_directory') }}" class="nav-btn {{ request()->routeIs('asset_directory') ? 'active' : '' }}" style="{{ request()->routeIs('asset_directory') ? 'pointer-events: none; cursor: default;' : '' }}">
                     <span class="material-icons-outlined">folder_open</span> Asset Directory
                 </a>
-                <a href="{{ route('Asset_analysis') }}" class="nav-btn">
+                <a href="{{ route('asset_analysis') }}" class="nav-btn">
                     <span class="material-icons-outlined">category</span> Asset Analysis
                 </a>
                 <a href="{{ route('location_analysis') }}" class="nav-btn">

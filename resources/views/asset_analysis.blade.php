@@ -60,7 +60,7 @@
             </header>
 
             <!-- FILTERS BAR -->
-            <form method="GET" action="{{ route('Asset_analysis') }}" id="filterForm">
+            <form method="GET" action="{{ route('asset_analysis') }}" id="filterForm">
                 <section class="filter-bar">
                     <div class="filter-group">
                         <label>Category</label>
