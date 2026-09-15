@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\DamageReportStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DamageReport extends Model
 {
@@ -16,6 +18,19 @@ class DamageReport extends Model
         'asset_name',
         'issue_type',
         'description',
+        'image_path',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => DamageReportStatus::class,
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }
