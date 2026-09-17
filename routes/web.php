@@ -4,17 +4,12 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use App\Models\Asset;
 use App\Http\Controllers\TagGeneratorController;
 use App\Http\Controllers\DamageReportController;
 use App\Http\Controllers\LogHistoryController;
+use App\Http\Controllers\DamageQueueController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 // --- Public / Authentication Routes ---
 Route::get('/', function () {
@@ -67,7 +62,38 @@ Route::middleware(['auth'])->group(function () {
 
     // Dashboards
     Route::get('/dashboard', function () {
-        $assets = Asset::all();
+        // Fetch active/unresolved damage reports
+        $activeDamageReports = DB::table('damage_reports')
+            ->whereNotIn('status', ['Resolved', 'Completed'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->keyBy(function ($item) {
+                // Key by clean tracking number (e.g. "DSK-021")
+                $cleanTracking = trim(explode('|', $item->tracking_number)[0]);
+                return strtoupper($cleanTracking);
+            });
+
+        $assets = Asset::all()->map(function ($asset) use ($activeDamageReports) {
+            $rawTracking = trim(explode('|', $asset->tracking_number)[0]);
+            $cleanTracking = strtoupper($rawTracking);
+            $stripped = str_replace('TRK-', '', $cleanTracking);
+            $withTrk = 'TRK-' . $cleanTracking;
+
+            // Match against active damage reports
+            $report = $activeDamageReports->get($cleanTracking)
+                ?? $activeDamageReports->get($stripped)
+                ?? $activeDamageReports->get($withTrk);
+
+            if ($report) {
+                $asset->latest_damage_status = $report->status;
+                $asset->latest_damage_issue = $report->issue_type ?? $report->description ?? 'Reported Issue';
+                $asset->condition = 'Damaged';
+                $asset->status = 'Pending Repair';
+            }
+
+            return $asset;
+        });
+
         return view('asset_dashboard', compact('assets'));
     })->name('asset_dashboard');
 
@@ -125,7 +151,7 @@ Route::middleware(['auth'])->group(function () {
         return view('asset_directory', compact('assets', 'categories', 'types', 'summaryData'));
     })->name('asset_directory');
 
-    // --- Category Management Routes ---
+    // Category Management Routes
     Route::post('/categories/store', function (Request $request) {
         $request->validate(['category_name' => 'required|string|max:255']);
         $categoryName = trim($request->category_name);
@@ -391,16 +417,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/damage-queue', [DamageReportController::class, 'index'])->name('damage_queue');
     Route::post('/damage-queue/report', [DamageReportController::class, 'store'])->name('report_damage.store');
     Route::post('/damage-queue/report-issue', [DamageReportController::class, 'store'])->name('report_issue');
+    Route::patch('/damage-queue/{id}/resolve', [DamageQueueController::class, 'resolve'])->name('damage_queue.resolve');
 
     // Tag Generator & Bulk Actions
     Route::get('/tags/next-number', [TagGeneratorController::class, 'getNextNumber'])->name('tags.next_number');
     Route::post('/tags/bulk-generate', [TagGeneratorController::class, 'storeBulkTags'])->name('generate_bulk_tags');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Modal & API Endpoint Routes
-    |--------------------------------------------------------------------------
-    */
     Route::prefix('api')->group(function () {
         Route::get('/assets/by-type', [TagGeneratorController::class, 'getAssetsByType'])->name('assets.by_type');
         Route::get('/assets/tracking/{trackingNumber}', [TagGeneratorController::class, 'getAssetByTracking'])->name('assets.get_by_tracking');

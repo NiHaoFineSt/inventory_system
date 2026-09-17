@@ -95,11 +95,11 @@
             <!-- METRIC CARDS ROW -->
             <section class="metrics-grid">
                 <div class="metric-card">
-                    <h2>{{ $itAssetsCount }}</h2>
+                    <h2 id="metricItAssets">{{ $itAssetsCount }}</h2>
                     <p>IT Assets</p>
                 </div>
                 <div class="metric-card">
-                    <h2>{{ $furnitureCount }}</h2>
+                    <h2 id="metricFurniture">{{ $furnitureCount }}</h2>
                     <p>Furniture Units</p>
                 </div>
                 <div class="metric-card">
@@ -115,25 +115,25 @@
                 <div class="widget-card">
                     <h3>Asset Condition Breakdown</h3>
                     <div class="bar-item">
-                        <span>Good Condition ({{ $conditionBreakdown['good']['percent'] }}%)</span>
+                        <span id="labelGood">Good Condition ({{ $conditionBreakdown['good']['percent'] }}%)</span>
                         <div class="bar-bg">
-                            <div class="bar-fill" style="width: {{ $conditionBreakdown['good']['percent'] }}%; background-color: #65a30d;">
+                            <div class="bar-fill" id="barGood" style="width: {{ $conditionBreakdown['good']['percent'] }}%; background-color: #65a30d;">
                                 {{ $conditionBreakdown['good']['count'] }}
                             </div>
                         </div>
                     </div>
                     <div class="bar-item">
-                        <span>Fair / Minor Wear ({{ $conditionBreakdown['fair']['percent'] }}%)</span>
+                        <span id="labelFair">Fair / Minor Wear ({{ $conditionBreakdown['fair']['percent'] }}%)</span>
                         <div class="bar-bg">
-                            <div class="bar-fill" style="width: {{ $conditionBreakdown['fair']['percent'] }}%; background-color: #eab308;">
+                            <div class="bar-fill" id="barFair" style="width: {{ $conditionBreakdown['fair']['percent'] }}%; background-color: #eab308;">
                                 {{ $conditionBreakdown['fair']['count'] }}
                             </div>
                         </div>
                     </div>
                     <div class="bar-item">
-                        <span>Critical / Needs Repair ({{ $conditionBreakdown['critical']['percent'] }}%)</span>
+                        <span id="labelCritical">Critical / Needs Repair ({{ $conditionBreakdown['critical']['percent'] }}%)</span>
                         <div class="bar-bg">
-                            <div class="bar-fill" style="width: {{ $conditionBreakdown['critical']['percent'] }}%; background-color: #ef4444;">
+                            <div class="bar-fill" id="barCritical" style="width: {{ $conditionBreakdown['critical']['percent'] }}%; background-color: #ef4444;">
                                 {{ $conditionBreakdown['critical']['count'] }}
                             </div>
                         </div>
@@ -206,6 +206,105 @@
         </main>
 
     </div>
+
+    <script>
+        const rawAnalysisData = @json($assets ?? []);
+
+        // 1. Deduplicate raw items using exact Dashboard Base Code logic
+        const deduplicatedAnalysisMap = new Map();
+
+        rawAnalysisData.forEach(item => {
+            const rawTracking = item.tracking_number || `AST-${item.id}`;
+            const baseCode = rawTracking.split('|')[0].trim().replace(/^TRK-/i, '').toUpperCase();
+
+            if (!baseCode) return;
+
+            if (!deduplicatedAnalysisMap.has(baseCode)) {
+                deduplicatedAnalysisMap.set(baseCode, item);
+            } else if (deduplicatedAnalysisMap.get(baseCode).tracking_number?.startsWith('TRK-') && !rawTracking.startsWith('TRK-')) {
+                deduplicatedAnalysisMap.set(baseCode, item);
+            }
+        });
+
+        const analysisDataset = Array.from(deduplicatedAnalysisMap.values());
+
+        // 2. Shared repair check
+        function isDamaged(item) {
+            const damageStatus = String(item.latest_damage_status ?? item.damage_status ?? item.status ?? '').toLowerCase().trim();
+            const damageIssue = String(item.latest_damage_issue ?? item.issue_type ?? item.description ?? '').toLowerCase().trim();
+            const assetStatus = String(item.asset_status ?? item.status ?? '').toLowerCase().trim();
+            const assetCondition = String(item.asset_condition ?? item.condition ?? '').toLowerCase().trim();
+
+            if (damageStatus === 'resolved' || damageStatus === 'completed') {
+                return false;
+            }
+
+            const keywords = ['pending', 'inspection', 'missing', 'damage', 'damaged', 'repair', 'broken', 'faulty', 'malfunction', 'reported', 'critical', 'needs repair'];
+
+            return keywords.some(kw => 
+                damageStatus.includes(kw) || 
+                damageIssue.includes(kw) || 
+                assetStatus.includes(kw) || 
+                assetCondition.includes(kw)
+            );
+        }
+
+        // 3. Sync UI elements on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!analysisDataset.length) return;
+
+            const total = analysisDataset.length;
+            const criticalCount = analysisDataset.filter(isDamaged).length;
+            const goodCount = analysisDataset.filter(item => !isDamaged(item) && String(item.condition || item.asset_condition || '').toLowerCase().includes('good')).length;
+            const fairCount = Math.max(0, total - criticalCount - goodCount);
+
+            const criticalPct = total > 0 ? Math.round((criticalCount / total) * 100) : 0;
+            const goodPct = total > 0 ? Math.round((goodCount / total) * 100) : 0;
+            const fairPct = total > 0 ? Math.round((fairCount / total) * 100) : 0;
+
+            // Recalculate IT vs Furniture Metric Cards
+            const itCount = analysisDataset.filter(i => {
+                const cat = String(i.category || i.type || '').toLowerCase();
+                return cat.includes('it') || cat.includes('hardware') || cat.includes('monitor') || cat.includes('laptop');
+            }).length;
+
+            const furnitureCount = analysisDataset.filter(i => {
+                const cat = String(i.category || i.type || '').toLowerCase();
+                return cat.includes('furniture') || cat.includes('chair') || cat.includes('desk');
+            }).length;
+
+            // Update DOM metrics
+            const elIt = document.getElementById('metricItAssets');
+            const elFurn = document.getElementById('metricFurniture');
+            if (elIt) elIt.innerText = itCount;
+            if (elFurn) elFurn.innerText = furnitureCount;
+
+            // Update Progress Bar visuals
+            const barGood = document.getElementById('barGood');
+            const labelGood = document.getElementById('labelGood');
+            if (barGood && labelGood) {
+                barGood.style.width = goodPct + '%';
+                barGood.innerText = goodCount;
+                labelGood.innerText = `Good Condition (${goodPct}%)`;
+            }
+
+            const barFair = document.getElementById('barFair');
+            const labelFair = document.getElementById('labelFair');
+            if (barFair && labelFair) {
+                barFair.style.width = fairPct + '%';
+                barFair.innerText = fairCount;
+                labelFair.innerText = `Fair / Minor Wear (${fairPct}%)`;
+            }
+
+            const barCritical = document.getElementById('barCritical');
+            const labelCritical = document.getElementById('labelCritical');
+            if (barCritical && labelCritical) {
+                barCritical.style.width = criticalPct + '%';
+                barCritical.innerText = criticalCount;
+                labelCritical.innerText = `Critical / Needs Repair (${criticalPct}%)`;
+            }
+        });
+    </script>
 
 </body>
 </html>

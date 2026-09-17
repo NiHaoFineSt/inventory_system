@@ -8,60 +8,7 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    @vite(['resources/css/asset_directory.css', 'resources/css/tag_generator.css'])
-
-    <style>
-        .asset-hover-wrapper {
-            position: relative;
-            display: inline-block;
-            cursor: pointer;
-        }
-
-        .asset-hover-name {
-            color: #2563eb;
-            font-weight: 600;
-            text-decoration: underline;
-        }
-
-        .asset-hover-card {
-            display: none;
-            position: absolute;
-            left: 0;
-            top: 100%;
-            z-index: 100;
-            width: 280px;
-            padding: 12px;
-            background-color: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            text-align: left;
-            font-size: 13px;
-            color: #334155;
-            line-height: 1.5;
-        }
-
-        .asset-hover-wrapper:hover .asset-hover-card {
-            display: block;
-        }
-
-        .hover-title {
-            font-weight: 700;
-            color: #0f172a;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 4px;
-            margin-bottom: 8px;
-        }
-
-        .hover-field {
-            margin-bottom: 4px;
-        }
-
-        .hover-label {
-            font-weight: 600;
-            color: #64748b;
-        }
-    </style>
+    @vite(['resources/css/damage_queue.css', 'resources/css/asset_directory.css', 'resources/css/tag_generator.css'])
 </head>
 <body>
 
@@ -86,7 +33,7 @@
                 <a href="{{ route('location_analysis') }}" class="nav-btn {{ request()->routeIs('location_analysis') ? 'active' : '' }}">
                     <span class="material-icons-outlined">business</span> Location Analysis
                 </a>
-                <a href="{{ route('damage_queue') }}" class="nav-btn {{ request()->routeIs('damage_queue') ? 'active' : '' }}" style="{{ request()->routeIs('damage_queue') ? 'pointer-events: none; cursor: default;' : '' }}">
+                <a href="{{ route('damage_queue') }}" class="nav-btn {{ request()->routeIs('damage_queue') ? 'active' : '' }}">
                     <span class="material-icons-outlined">report_problem</span> Damage Queue
                 </a>
                 <a href="{{ route('log_history') }}" class="nav-btn">
@@ -95,7 +42,7 @@
             </nav>
 
             <div class="sidebar-footer">
-                <form action="{{ route('logout') }}" method="POST" style="margin: 0;">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="logout-link">
                         <span class="material-icons-outlined">logout</span> Sign Out
@@ -106,12 +53,25 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <header class="top-banner" style="display: flex; justify-content: space-between; align-items: center;">
+            <header class="top-banner">
                 <h1>Damage Queue</h1>
             </header>
 
+            <!-- ALERTS -->
+            @if(session('success'))
+                <div class="alert alert-success" style="padding: 12px 16px; background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; border-radius: 6px; margin-bottom: 16px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger" style="padding: 12px 16px; background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; border-radius: 6px; margin-bottom: 16px;">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             <!-- DAMAGE QUEUE TABLE -->
-            <section class="table-card" style="margin-top: 20px;">
+            <section class="table-card">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -120,7 +80,7 @@
                             <th>Issue Type</th>
                             <th>Status</th>
                             <th>Reported Date</th>
-                            <th style="text-align: center;">Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,15 +88,38 @@
                             <tr>
                                 <td><strong>{{ $item->tracking_number ?? 'N/A' }}</strong></td>
                                 
+                                <!-- ASSET CELL WITH READ-ONLY HOVER CARD -->
                                 <td>
                                     <div class="asset-hover-wrapper">
                                         <span class="asset-hover-name">{{ $item->asset_name ?? 'N/A' }}</span>
+                                        
                                         <div class="asset-hover-card">
                                             <div class="hover-title">Report Details</div>
-                                            <div class="hover-field"><span class="hover-label">Reported By:</span> {{ $item->reported_by ?? 'Staff' }}</div>
-                                            <div class="hover-field"><span class="hover-label">Issue Type:</span> {{ $item->issue_type ?? 'N/A' }}</div>
-                                            <div class="hover-field"><span class="hover-label">Description:</span> {{ $item->description ?? $item->issue_description ?? 'No description provided.' }}</div>
-                                            <div class="hover-field"><span class="hover-label">Date:</span> {{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d H:i') : 'N/A' }}</div>
+                                            
+                                            <div class="hover-field">
+                                                <span class="hover-label">Reported By:</span>
+                                                <span class="hover-value">{{ $item->reported_by ?? $item->reporter_name ?? 'Staff' }}</span>
+                                            </div>
+                                            
+                                            <div class="hover-field">
+                                                <span class="hover-label">Contact / Email:</span>
+                                                <span class="hover-value">{{ $item->reporter_email ?? 'N/A' }}</span>
+                                            </div>
+                                            
+                                            <div class="hover-field">
+                                                <span class="hover-label">Issue Type:</span>
+                                                <span class="hover-value">{{ $item->issue_type ?? 'N/A' }}</span>
+                                            </div>
+                                            
+                                            <div class="hover-field">
+                                                <span class="hover-label">Description:</span>
+                                                <span class="hover-value">{{ $item->description ?? $item->issue_description ?? 'No details provided.' }}</span>
+                                            </div>
+                                            
+                                            <div class="hover-field">
+                                                <span class="hover-label">Reported Date:</span>
+                                                <span class="hover-value">{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d H:i') : 'N/A' }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -145,13 +128,24 @@
                                 <td>{{ $item->status ?? 'Pending Inspection' }}</td>
                                 <td>{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') : 'N/A' }}</td>
                                 
-                                <td style="text-align: center;">
-                                    <button class="btn-action" style="background-color: #2563eb; color: #fff; padding: 4px 8px; border-radius: 4px; border: none; cursor: pointer;">Resolve</button>
+                                <!-- ACTION CELL -->
+                                <td class="text-center">
+                                    @if(($item->status ?? '') !== 'Resolved')
+                                        <form action="{{ route('damage_queue.resolve', $item->id) }}" method="POST" style="display: inline;">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn-action btn-resolve" onclick="return confirm('Mark this damage report as resolved?')" style="background-color: #16a34a; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                                                Resolve
+                                            </button>
+                                        </form>
+                                    @else
+                                        <span style="color: #16a34a; font-weight: 600;">✓ Completed</span>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">
+                                <td colspan="6" class="empty-row" style="text-align: center; padding: 20px; color: #64748b;">
                                     No reported damages in queue.
                                 </td>
                             </tr>
@@ -163,35 +157,35 @@
     </div>
 
     <!-- REPORT DAMAGED ASSET MODAL -->
-    <div id="reportDamageModal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
-        <div class="modal-card" style="background: #fff; width: 100%; max-width: 480px; padding: 24px; border-radius: 8px; position: relative;">
-            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Report Damaged Asset</h3>
-                <span class="material-icons-outlined close-btn" style="cursor: pointer; color: #64748b;" onclick="closeModal('reportDamageModal')">close</span>
+    <div id="reportDamageModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Report Damaged Asset</h3>
+                <span class="material-icons-outlined close-btn" onclick="closeModal('reportDamageModal')">close</span>
             </div>
 
             <form id="damageReportForm" action="{{ route('report_damage.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="report-tracking-number" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                <div class="form-group">
+                    <label for="report-tracking-number">
                         TRACKING NUMBER (SCAN QR OR ENTER CODE)
                     </label>
-                    <input type="text" id="report-tracking-number" name="tracking_number" class="form-control" placeholder="e.g. DSK-019" required style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <input type="text" id="report-tracking-number" name="tracking_number" class="form-control" placeholder="e.g. DSK-019" required>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="report-asset-name" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                <div class="form-group">
+                    <label for="report-asset-name">
                         ASSET NAME
                     </label>
-                    <input type="text" id="report-asset-name" name="asset_name" class="form-control" placeholder="e.g. Standing Desk #7" readonly style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; background-color: #f8fafc;">
+                    <input type="text" id="report-asset-name" name="asset_name" class="form-control readonly-input" placeholder="e.g. Standing Desk #7" readonly>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="issue_type" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                <div class="form-group">
+                    <label for="issue_type">
                         ISSUE TYPE
                     </label>
-                    <select id="issue_type" name="issue_type" class="form-control" required style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <select id="issue_type" name="issue_type" class="form-control" required>
                         <option value="Hardware Malfunction">Hardware Malfunction</option>
                         <option value="Physical Damage">Physical Damage</option>
                         <option value="Missing Parts">Missing Parts</option>
@@ -199,21 +193,21 @@
                     </select>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 14px;">
-                    <label for="damage_photo" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                <div class="form-group">
+                    <label for="damage_photo">
                         SNAP / UPLOAD DAMAGE PHOTO
                     </label>
-                    <input type="file" id="damage_photo" name="damage_photo" class="form-control" style="width: 100%; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                    <input type="file" id="damage_photo" name="damage_photo" class="form-control">
                 </div>
 
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label for="issue_description" style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 4px;">
+                <div class="form-group">
+                    <label for="issue_description">
                         ISSUE DESCRIPTION
                     </label>
-                    <textarea id="issue_description" name="issue_description" rows="3" class="form-control" placeholder="Describe the damage or fault..." style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px;"></textarea>
+                    <textarea id="issue_description" name="issue_description" rows="3" class="form-control" placeholder="Describe the damage or fault..."></textarea>
                 </div>
 
-                <button type="submit" style="width: 100%; background-color: #4d7c0f; color: #fff; padding: 12px; border: none; border-radius: 6px; font-weight: 700; cursor: pointer;">
+                <button type="submit" class="btn-submit">
                     Submit Damage Report
                 </button>
             </form>

@@ -21,9 +21,11 @@ body {
     background-color: #041f48;
     padding: 24px 16px;
     display: flex;
+    height: 100vh;
     flex-direction: column;
     align-items: center;
     border-right: 1px solid #ffffff;
+    position: fixed;
 }
 
 .sidebar-logo {
@@ -98,6 +100,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-left: 240px;
 }
 
 .top-banner {
@@ -319,4 +322,96 @@ body {
 
 .reject-btn:hover {
     background-color: #dc2626;
+}
+
+/* --- TABLE OVERFLOW & HOVER CARD STYLING --- */
+.data-table,
+.data-table tbody,
+.data-table tr,
+.data-table td,
+.table-card {
+    position: relative;
+    overflow: visible !important;
+}
+
+.asset-hover-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.asset-hover-name {
+    color: #2563eb;
+    font-weight: 600;
+    text-decoration: underline;
+    transition: color 0.15s ease;
+}
+
+.asset-hover-name:hover {
+    color: #1d4ed8;
+}
+
+/* READ-ONLY TOOLTIP CARD */
+.asset-hover-card {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    z-index: 9999;
+    width: 290px;
+    padding: 14px;
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    text-align: left;
+    font-size: 13px;
+    color: #1e293b;
+    line-height: 1.5;
+    pointer-events: none;
+    /* Prevents text editing/selection interactions */
+}
+
+/* TRIGGER HOVER CARD */
+.asset-hover-wrapper:hover .asset-hover-card {
+    display: block !important;
+}
+
+/* CARD DETAILS STYLING */
+.hover-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.hover-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.hover-field:last-child {
+    margin-bottom: 0;
+}
+
+.hover-label {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.hover-value {
+    font-weight: 500;
+    color: #1e293b;
+    font-size: 12px;
+    text-align: right;
+    word-break: break-word;
 }

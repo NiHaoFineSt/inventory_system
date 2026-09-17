@@ -5,12 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Models\DamageReport;
 
 class DamageReportController extends Controller
 {
     /**
-     * Display the damage queue page with submitted reports.
+     * Redirect index calls to DamageQueueController or render queue view.
      */
     public function index()
     {
@@ -25,17 +24,20 @@ class DamageReportController extends Controller
     }
 
     /**
-     * Store new damage reports submitted by Staff or Asset Team.
+     * Store a new damage report submitted by users.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'tracking_number' => 'required',
-            'asset_name'      => 'required',
-            'issue_type'      => 'required',
+            'tracking_number' => 'required|string',
+            'asset_name'      => 'required|string',
+            'issue_type'      => 'required|string',
         ]);
 
         $user = Auth::user();
+
+        // Extract clean tracking number
+        $cleanTrackingNumber = trim(explode('|', $request->input('tracking_number'))[0]);
 
         $description = $request->input('description') 
                     ?? $request->input('issue_description') 
@@ -48,14 +50,14 @@ class DamageReportController extends Controller
             $imagePath = $request->file('damage_photo')->store('damage_photos', 'public');
         }
 
-        $reporterName = $user->name ?? $user->email ?? 'Aussy';
+        $reporterName = $user->name ?? $user->email ?? 'System User';
 
-        DB::transaction(function () use ($request, $user, $reporterName, $description, $imagePath) {
-            // 1. Insert into damage_reports table
+        DB::transaction(function () use ($request, $user, $reporterName, $description, $imagePath, $cleanTrackingNumber) {
+            // 1. Create damage_reports entry
             DB::table('damage_reports')->insert([
-                'user_id'         => $user->id ?? 5,
+                'user_id'         => $user->id ?? null,
                 'reported_by'     => $reporterName,
-                'tracking_number' => $request->tracking_number,
+                'tracking_number' => $cleanTrackingNumber,
                 'asset_name'      => $request->asset_name,
                 'issue_type'      => $request->issue_type,
                 'description'     => $description,
@@ -65,12 +67,23 @@ class DamageReportController extends Controller
                 'updated_at'      => now(),
             ]);
 
-            // 2. Insert into activity_logs table so it displays on Log History
+            // 2. Mark Asset as Damaged / Pending Repair
+            DB::table('assets')
+                ->where('tracking_number', $cleanTrackingNumber)
+                ->orWhere('tracking_number', 'TRK-' . $cleanTrackingNumber)
+                ->orWhere('tracking_number', str_replace('TRK-', '', $cleanTrackingNumber))
+                ->update([
+                    'condition'  => 'Damaged',
+                    'status'     => 'Pending Repair',
+                    'updated_at' => now(),
+                ]);
+
+            // 3. Log the reporting event
             DB::table('activity_logs')->insert([
-                'user_id'         => $user->id ?? 5,
+                'user_id'         => $user->id ?? null,
                 'action'          => 'REPORTED',
                 'asset_name'      => $request->asset_name,
-                'tracking_number' => $request->tracking_number,
+                'tracking_number' => $cleanTrackingNumber,
                 'performed_by'    => $reporterName,
                 'description'     => "Issue ({$request->issue_type}): {$description}",
                 'created_at'      => now(),
